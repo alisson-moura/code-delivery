@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ ! -f ".env" ]; then
-	cp .env.example .env
+        cp .env.example .env
 fi
 
 npm install
 
-npm run start:dev
+npm run dev -- --host

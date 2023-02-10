@@ -14,6 +14,7 @@ import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
 import { ClientKafka, MessagePattern, Payload } from '@nestjs/microservices';
 import { Producer } from 'kafkajs';
+import { RoutesGateway } from './routes/routes.gateway';
 
 @Controller('routes')
 export class RoutesController implements OnModuleInit {
@@ -23,6 +24,7 @@ export class RoutesController implements OnModuleInit {
     private readonly routesService: RoutesService,
     @Inject('KAFKA_SERVICE')
     private kafkaClient: ClientKafka,
+    private routeGateway: RoutesGateway,
   ) {}
 
   @Post()
@@ -69,14 +71,15 @@ export class RoutesController implements OnModuleInit {
   }
 
   @MessagePattern('route.new-position')
-  consumeNewPosition(
+  async consumeNewPosition(
     @Payload()
     message: {
       routeId: string;
+      clientId: string;
       position: [number, number];
       finished: boolean;
     },
   ) {
-    console.log(message);
+    await this.routeGateway.sendPosition(message);
   }
 }
